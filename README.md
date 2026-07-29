@@ -1,6 +1,6 @@
 # Bash Scripting
 
-## 📖 Overview
+##  Overview
 
 Bash (Bourne Again SHell) is a Unix/Linux command-line shell and scripting language used to automate repetitive tasks, manage servers, deploy applications, and perform system administration.
 
@@ -8,7 +8,7 @@ Bash scripting is one of the core skills for DevOps Engineers because it enables
 
 ---
 
-## 🎯 Learning Objectives
+##  Learning Objectives
 
 - Understand the Linux shell
 - Navigate the Linux file system
