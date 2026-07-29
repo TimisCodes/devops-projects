@@ -238,13 +238,26 @@ Permissions
 Download artifact
 
 ```bash
-aws s3 cp s3://YOUR-S3-BUCKET/vprofile-v2.war .
+aws s3 cp s3://YOUR-S3-BUCKET/vprofile-v2.war 
+```
+Copy artifacts to tmp-directory
+
+```bash
+aws s3 cp s3://YOUR-S3-BUCKET/vprofile-v2.war /tmp/
+systemctl daemon-reload
+systemctl stop tomcat10
+```
+Remove the initial ROOT and Copy New
+
+```bash
+rm -rf /var/lib/tomcat10/webapps/ROOT
+aws s3 cp s3://YOUR-S3-BUCKET/vprofile-v2.war /var/lib/tomcat10/webapps or cp /tmp/vprofile-v2.war //var/lib/tomcat10/webapps/
 ```
 
 Deploy
 
 ```bash
-cp vprofile-v2.war /opt/tomcat/webapps/
+ls /var/lib/tomcat10/webapps # Make sure ROOT.war appears
 ```
 
 Restart Tomcat
