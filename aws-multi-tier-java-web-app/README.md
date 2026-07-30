@@ -131,7 +131,8 @@ Allowed Inbound Rules
 | -------- | ---- | --------- |
 | HTTP     | 80   | 0.0.0.0/0 |
 | HTTPS    | 443  | 0.0.0.0/0 |
-
+| HTTP     | 80   | ::/0 |
+| HTTPS    | 443  | ::/0 |
 ---
 
 ## Application Security Group
@@ -157,17 +158,15 @@ Allowed Inbound Rules
 
 #  Building the Application
 
-Clone the project
+Clone the project in your VS Code
 
 ```bash
-git clone <repository-url>
+git clone (https://github.com/hkhcoder/vprofile-project.git)
 ```
 
-Navigate into the project
-
-```bash
-cd vprofile-project
-```
+Navigate into the project folder
+# change branch to awsliftandshift
+# open vprofile-project then;
 
 Build the application
 
@@ -194,7 +193,7 @@ target/vprofile-v2.war
 Configure AWS CLI
 
 ```bash
-aws configure
+aws configure <add your S3-user keys>
 ```
 
 Upload the WAR file
@@ -238,6 +237,7 @@ Permissions
 Download artifact
 
 ```bash
+snap install aws-cli --classic
 aws s3 cp s3://YOUR-S3-BUCKET/vprofile-v2.war 
 ```
 Copy artifacts to tmp-directory
@@ -251,7 +251,7 @@ Remove the initial ROOT and Copy New
 
 ```bash
 rm -rf /var/lib/tomcat10/webapps/ROOT
-aws s3 cp s3://YOUR-S3-BUCKET/vprofile-v2.war /var/lib/tomcat10/webapps or cp /tmp/vprofile-v2.war //var/lib/tomcat10/webapps/
+mv /tmp/vprofile-v2.war /var/lib/tomcat10/webapps/ROOT.war
 ```
 
 Deploy
