@@ -1,0 +1,382 @@
+Based on everything you've learned so far (Linux, Git, Bash, AWS EC2, EBS, AMI, IAM, S3, Tomcat, Maven, Route 53, Target Groups, Application Load Balancer, Auto Scaling, Launch Templates, Multi-Tier Architecture, RabbitMQ, Memcached, MySQL, and deployment), here are **10 portfolio-quality projects**.
+
+These are ordered so each project builds on the previous one, just like real infrastructure evolves.
+
+---
+
+# Day 1 — Linux Server Administration
+
+## Goal
+
+Provision and configure a Linux server from scratch.
+
+### Tasks
+
+* Launch Ubuntu EC2
+* Connect using SSH
+* Create users and groups
+* Configure permissions
+* Install Apache
+* Create a custom HTML page
+* Configure hostname
+* Configure firewall/security group
+* Monitor disk usage
+* Monitor memory
+
+### Skills
+
+* EC2
+* Linux
+* SSH
+* File Permissions
+* Apache
+* System Administration
+
+---
+
+# Day 2 — EBS Storage Management
+
+## Goal
+
+Manage persistent storage.
+
+### Tasks
+
+* Create EBS Volume
+* Attach to EC2
+* Partition
+* Format
+* Mount
+* Configure `/etc/fstab`
+* Verify persistence after reboot
+* Resize volume
+* Extend filesystem
+* Take Snapshot
+
+### Skills
+
+* EBS
+* Snapshots
+* Linux Storage
+* Filesystems
+
+---
+
+# Day 3 — Static Website Deployment
+
+## Goal
+
+Deploy a website using Apache or Nginx.
+
+### Tasks
+
+* Clone website
+* Configure web server
+* Configure virtual host
+* Configure permissions
+* Test browser
+* Restart service
+* Create AMI
+
+### Skills
+
+* Apache/Nginx
+* EC2
+* AMI
+
+---
+
+# Day 4 — IAM + S3 Artifact Deployment
+
+## Goal
+
+Deploy application artifacts securely.
+
+### Tasks
+
+* Create IAM User
+* Create IAM Role
+* Create S3 Bucket
+* Upload files
+* Attach Role to EC2
+* Download files
+* Remove AWS credentials
+* Verify Role works
+
+### Skills
+
+* IAM
+* S3
+* AWS CLI
+* Security
+
+---
+
+# Day 5 — Java Application Deployment
+
+Deploy your VProfile application again without watching the course.
+
+### Tasks
+
+* Install Java
+* Install Maven
+* Build WAR
+* Upload WAR to S3
+* Download WAR
+* Deploy to Tomcat
+* Rename ROOT.war
+* Restart Tomcat
+* Verify browser
+
+### Skills
+
+* Maven
+* Tomcat
+* Java Deployment
+
+---
+
+# Day 6 — Multi-Tier Backend
+
+Build
+
+```text
+App Server
+
+↓
+
+MySQL
+
+↓
+
+Memcached
+
+↓
+
+RabbitMQ
+```
+
+### Tasks
+
+Create
+
+* db01
+* mc01
+* rmq01
+* app01
+
+Configure
+
+Security Groups
+
+Private DNS
+
+Application.properties
+
+Connectivity
+
+### Skills
+
+* MySQL
+* RabbitMQ
+* Memcached
+* Networking
+
+---
+
+# Day 7 — Load Balancer
+
+## Goal
+
+High Availability
+
+### Tasks
+
+Launch
+
+* app01
+* app02
+
+Create
+
+* Target Group
+* Load Balancer
+
+Configure
+
+Health Checks
+
+Register Instances
+
+Verify
+
+Refresh browser
+
+Terminate one instance
+
+Verify traffic still works
+
+### Skills
+
+* ALB
+* Target Groups
+* High Availability
+
+---
+
+# Day 8 — Auto Scaling
+
+## Goal
+
+Automatically scale application.
+
+### Tasks
+
+Create
+
+* AMI
+* Launch Template
+* Auto Scaling Group
+
+Configure
+
+Minimum
+
+Desired
+
+Maximum
+
+Terminate instance
+
+Watch Auto Scaling replace it
+
+### Skills
+
+* Launch Template
+* AMI
+* Auto Scaling
+
+---
+
+# Day 9 — Complete Production Architecture
+
+Build everything.
+
+```text
+Internet
+
+↓
+
+Route53
+
+↓
+
+ALB
+
+↓
+
+Target Group
+
+↓
+
+ASG
+
+↓
+
+Tomcat
+
+↓
+
+MySQL
+
+↓
+
+RabbitMQ
+
+↓
+
+Memcached
+```
+
+Exactly like a production deployment.
+
+---
+
+# Day 10 — Disaster Recovery
+
+Simulate failures.
+
+Delete
+
+* Instance
+* Target Group
+* EBS
+* Launch Template
+* Security Group
+
+Recover
+
+Everything
+
+Document
+
+Recovery Process
+
+This project teaches troubleshooting—one of the most valuable DevOps skills.
+
+---
+
+# Deliverables for Every Project
+
+Each project should produce:
+
+```
+Project Folder
+
+README.md
+
+Architecture Diagram
+
+Commands.md
+
+Lessons-Learned.md
+
+Screenshots/
+
+Troubleshooting.md
+```
+
+---
+
+# GitHub Structure
+
+```
+devops-projects/
+
+├── aws/
+│   ├── 01-linux-server-setup/
+│   ├── 02-ebs-storage-management/
+│   ├── 03-static-website-deployment/
+│   ├── 04-iam-s3-artifact-deployment/
+│   ├── 05-java-application-deployment/
+│   ├── 06-multi-tier-backend/
+│   ├── 07-load-balancer-target-group/
+│   ├── 08-auto-scaling-launch-template/
+│   ├── 09-production-architecture/
+│   └── 10-disaster-recovery/
+```
+
+---
+
+## Extra Challenge (Highly Recommended)
+
+After completing each project:
+
+1. Delete **everything** in AWS.
+2. Wait 10 minutes.
+3. Rebuild the entire project from memory.
+4. Compare your rebuilt version with your documentation.
+5. Update the documentation with anything you forgot or improved.
+
+That repetition will strengthen your troubleshooting skills, reduce reliance on tutorials, and give you the confidence to build similar environments in interviews or on the job.
+
