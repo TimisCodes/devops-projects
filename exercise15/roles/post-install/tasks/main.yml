@@ -1,0 +1,67 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for post-install
+- name: Install ntp agent on centos
+  yum:
+    name: "{{ item }}"
+    state: present
+  when: ansible_facts['distribution'] == "CentOS"
+  loop:
+    - chrony
+    - wget
+    - unzip
+    - zip
+
+- name: Install ntp agent on ubuntu
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  when: ansible_facts['distribution'] == "Ubuntu"
+  loop:
+    - ntp
+    - wget
+    - unzip
+    - zip
+    - git
+
+- name: Start and enable chronyd
+  service:
+    name: chronyd
+    state: started
+    enabled: yes
+  when: ansible_facts['distribution'] == "CentOS"
+
+- name: Start and enable ntp
+  service:
+    name: ntp
+    state: started
+    enabled: yes
+  when: ansible_facts['distribution'] == "Ubuntu"
+  notify:
+    - reStart and enable ntp
+
+- name: Copy Banner file
+  copy:
+    content: 'Deploy ntp agent conf on centos'
+    dest: /etc/motd
+
+- name: Deploy ntp agent conf on centos
+  template:
+    src: ntpconf_centos.j2
+    dest: /etc/chrony.conf
+    backup: yes
+  when: ansible_facts['distribution'] == "CentOS"
+  notify:
+    - reStart and enable chronyd
+
+- name: Create a directory or folder
+  file:
+    path: "{{mydir}}"
+    state: directory
+
+- name: Dump file
+  copy:
+    src: myfile.txt
+    dest: /tmp/myfile.txt
+

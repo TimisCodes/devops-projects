@@ -1,0 +1,8 @@
+---
+- name: Provisioning servers
+  hosts: all
+  become: yes
+  roles:
+    - role: post-install
+      vars:
+        USRNM: newuser

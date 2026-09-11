@@ -1,0 +1,75 @@
+---
+- name: Provisioning servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install ntp agent on centos
+      yum:
+        name: "{{ item }}"
+        state: present
+      when: ansible_facts['distribution'] == "CentOS"
+      loop:
+        - chrony
+        - wget
+        - unzip
+        - zip
+
+    - name: Install ntp agent on ubuntu
+      apt: 
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      when: ansible_facts['distribution'] == "Ubuntu" 
+      loop:
+        - ntp
+        - wget
+        - unzip
+        - zip
+        - git
+
+    - name: Start and enable chronyd
+      service:
+        name: chronyd
+        state: started
+        enabled: yes
+      when: ansible_facts['distribution'] == "CentOS"
+
+    - name: Start and enable ntp
+      service:
+        name: ntp
+        state: started
+        enabled: yes
+      when: ansible_facts['distribution'] == "Ubuntu"
+
+    - name: Copy Banner file
+      copy:
+        content: 'Deploy ntp agent conf on centos'
+        dest: /etc/motd
+
+    - name: Deploy ntp agent conf on centos
+      template: 
+        src: templates/ntpconf_centos
+        dest: /etc/chrony.conf
+        backup: yes
+      when: ansible_facts['distribution'] == "CentOS"
+
+
+    - name: reStart and enable chronyd
+      service:
+        name: chronyd
+        state: restarted
+        enabled: yes
+      when: ansible_facts['distribution'] == "CentOS"
+
+    - name: reStart and enable ntp
+      service:
+        name: ntp
+        state: restarted
+        enabled: yes
+      when: ansible_facts['distribution'] == "Ubuntu"
+
+    - name: Create a directory or folder
+      file:
+        path: /tmp/test23
+        state: directory
+

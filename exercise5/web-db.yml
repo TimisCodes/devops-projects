@@ -1,0 +1,35 @@
+---
+- name: Webservers
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: DBserver setup
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+    - name: Start Dbserver setup
+      ansible.builtin.service:
+        name: httpd
+        state: started
+    - name: Enable Dbserver setup
+      ansible.builtin.service:
+        name: httpd
+        enabled: yes
+    - name: Copy file
+      ansible.builtin.copy:
+        src: index.html
+        dest: /var/www/html/index.html
+        owner: apache
+        group: apache
+        mode: '0644'
+
+- name: Database
+  hosts: dbservers
+  become: true
+
+  tasks:
+    - name: Install mariadb server
+      ansible.builtin.yum:
+        name: mariadb-server
+        state: present

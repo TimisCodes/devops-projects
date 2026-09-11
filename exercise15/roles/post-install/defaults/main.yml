@@ -1,0 +1,8 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for post-install
+USRNM: commonuser
+COMM: variable from groupvars_all file
+mydir: /opt/dir22
+
+

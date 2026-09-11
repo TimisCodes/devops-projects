@@ -1,0 +1,17 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for post-install
+- name: reStart and enable chronyd
+  service:
+    name: chronyd
+    state: restarted
+    enabled: yes
+  when: ansible_facts['distribution'] == "CentOS"
+
+- name: reStart and enable ntp
+  service:
+    name: ntp
+    state: restarted
+    enabled: yes
+  when: ansible_facts['distribution'] == "Ubuntu"
+
