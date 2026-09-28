@@ -1,0 +1,53 @@
+import boto3
+import json
+from datetime import datetime
+
+def lambda_handler(event, context):
+    ec2 = boto3.client('ec2')
+    sns = boto3.client('sns')
+    s3 = boto3.client('s3')
+
+    sns_topic_arn = "arn:aws:sns:us-east-1:983794312705:SGCompliaceNotification"
+    s3_bucket_name = "sg-compliance921"
+
+    findings = []
+    regions = [r['RegionName'] for r in ec2.describe_regions()['Regions']]
+
+    for region in regions:
+        ec2_region = boto3.client('ec2', region_name=region)
+        sgs = ec2_region.describe_security_groups()['SecurityGroups']
+
+        for sg in sgs:
+            for perm in sg.get('IpPermissions', []):
+                for ip_range in perm.get('IpRanges', []):
+                    if ip_range.get('CidrIp') == '0.0.0.0/0':
+                        findings.append({
+                            "Region": region,
+                            "SecurityGroupId": sg['GroupId'],
+                            "Port": perm.get('FromPort'),
+                            "Protocol": perm.get('IpProtocol')
+                        })
+
+    message = "No open security group rules found." if not findings else \
+              "Security Group Compliance Findings:\n" + json.dumps(findings, indent=2)
+
+    # 📩 Send SNS alert
+    sns.publish(
+        TopicArn=sns_topic_arn,
+        Subject="Security Group Compliance Report",
+        Message=message
+    )
+
+    # 💾 Save to S3
+    report_name = f"security-audit-{datetime.utcnow().strftime('%Y-%m-%d-%H-%M-%S')}.json"
+    s3.put_object(
+        Bucket=s3_bucket_name,
+        Key=report_name,
+        Body=json.dumps(findings, indent=2),
+        ContentType="application/json"
+    )
+
+    return {
+        "statusCode": 200,
+        "body": f"Findings: {findings}" if findings else "No open security group rules found."
+    }
