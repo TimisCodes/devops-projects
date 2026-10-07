@@ -9,7 +9,7 @@ Then insert the config code inside the ~/.ssh/config
 ssh -T git@bitbucket.org 
 git clone git@bitbucket
 
-############################################
+#############################################
 To push code cloned from github to bitbucket
 
 mkdir folder
