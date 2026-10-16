@@ -8,6 +8,9 @@ jobs:
   build-and-push-and-deploy:
     runs-on: self-hosted # 🌟 Uses your local machine runner instead of cloud VMs
 
+    environment: 
+      name: production
+
     steps:
       # 1. Checkout the repository code
       - name: Checkout Code
