@@ -242,4 +242,4 @@ Here, `kubectl` is the command-line tool you use to communicate with a Kubernete
 
 Your DevOps goal: Learn to build an application, containerize it with Docker, deploy it with Kubernetes, automate delivery through CI/CD, and monitor it in production. That combination will give you valuable practical experience for junior DevOps and Cloud Engineering roles.
 
-# updated I
+# updated II
