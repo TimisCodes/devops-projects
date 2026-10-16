@@ -1,5 +1,6 @@
-services:
+version: '3.8'
 
+services:
   frontend:
     build:
       context: ./frontend
@@ -23,8 +24,8 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-    expose:
-      - "2300"
+    ports:
+      - "2300:2300" # Uncomment this if you want to access the API directly from your host/browser
     depends_on:
       database:
         condition: service_healthy
