@@ -28,7 +28,7 @@ jobs:
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
+          context: ./gadgetapp/frontend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/gadgetapp-frontend:latest
 
@@ -36,7 +36,7 @@ jobs:
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: ./gadgetapp/backend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/gadgetapp-backend:latest
 
