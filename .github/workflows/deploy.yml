@@ -23,7 +23,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 3. Build and Push Frontend Image
+      # 3. Build and Push Frontend Image 1
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
