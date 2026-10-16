@@ -6,18 +6,14 @@ on:
 
 jobs:
   build-and-push-and-deploy:
-    runs-on: ubuntu-latest
-    
-    # 🌟 This explicitly links the job to your GitHub "production" environment
-    environment: 
-      name: production
+    runs-on: self-hosted # 🌟 Uses your local machine runner instead of cloud VMs
 
     steps:
       # 1. Checkout the repository code
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Log in to Docker Hub using production secrets
+      # 2. Log in to Docker Hub using repository/environment secrets
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -40,26 +36,12 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/gadgetapp-backend:latest
 
-      # 5. Connect to your VM via SSH to pull the new images and restart containers
-      - name: Deploy to VM via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          script: |
-            # Navigate to your project directory on the VM
-            cd ~/devops-projects/gadgetapp
-
-            # Fetch and switch to the target branch and pull latest updates
-            git fetch origin kubernetes
-            git checkout kubernetes
-            git pull origin kubernetes
-
-            # Pull the newly pushed images from Docker Hub and restart containers
-            docker compose pull
-            docker compose down
-            docker compose up -d
-
-            # Clean up old unused Docker images
-            docker image prune -f
+      # 5. Run Docker Compose locally on your machine
+      - name: Deploy Locally via Docker Compose
+        run: |
+          cd gadgetapp
+          docker compose pull
+          docker compose down
+          docker compose up -d
+          docker image prune -f
+        shell: bash # Ensures it runs via Git Bash or WSL on Windows
