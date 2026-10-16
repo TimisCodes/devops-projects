@@ -2,7 +2,7 @@ const express = require("express");
 const pool = require("./db");
 
 const app = express();
-const PORT = 3000;
+const PORT = 2300;
 
 app.use(express.json());
 
