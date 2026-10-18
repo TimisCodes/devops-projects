@@ -43,6 +43,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      AWS_REGION: us-east-1
+      S3_BUCKET_NAME: timiscode-gadgetapp-images-2026
     volumes:
       - gadget-data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
