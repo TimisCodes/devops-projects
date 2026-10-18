@@ -29,6 +29,7 @@ services:
       - "2300:2300"
     volumes:
       - gadget-uploads:/app/uploads
+      - /root/.aws:/root/.aws:ro
     depends_on:
       database:
         condition: service_healthy
