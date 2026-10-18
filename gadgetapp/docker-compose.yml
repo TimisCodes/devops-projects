@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   frontend:
@@ -19,13 +18,17 @@ services:
       context: ./backend
     container_name: gadgetapp-backend
     environment:
+      PORT: 2300
+      UPLOAD_DIR: /app/uploads
       DB_HOST: database
       DB_PORT: 5432
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "2300:2300" # Uncomment this if you want to access the API directly from your host/browser
+      - "2300:2300"
+    volumes:
+      - gadget-uploads:/app/uploads
     depends_on:
       database:
         condition: service_healthy
@@ -61,3 +64,4 @@ networks:
 
 volumes:
   gadget-data:
+  gadget-uploads:
