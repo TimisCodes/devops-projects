@@ -1,15 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>GadgetApp</title>
-<!-- This is a single comment  -->
+    <meta name="description" content="Manage gadgets and their images.">
+    <title>GadgetApp | Inventory Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <header>
         <h1>Timi's GadgetApp</h1>
         <p>Your gadget inventory dashboard</p>
@@ -17,13 +16,27 @@
 
     <main>
         <section class="card">
-            <h2>Available Gadgets</h2>
+            <div class="section-heading">
+                <div>
+                    <h2>Available Gadgets</h2>
+                    <p>Browse gadgets, upload photos and download images.</p>
+                </div>
+                <button id="refresh-button" class="secondary-button" type="button">
+                    Refresh
+                </button>
+            </div>
 
-            <p id="status">Loading gadgets...</p>
+            <p id="status" role="status" aria-live="polite">
+                Loading gadgets...
+            </p>
 
-            <div id="gadget-list"></div>
+            <div id="gadget-list" class="gadget-grid"></div>
         </section>
     </main>
+
+    <footer>
+        <p>GadgetApp · Gadget inventory and image management</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

@@ -6,6 +6,8 @@ COPY package*.json ./
 
 RUN npm install --omit=dev
 
+RUN npm install multer
+
 COPY . .
 
 ENV NODE_ENV=production

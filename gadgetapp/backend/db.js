@@ -1,3 +1,4 @@
+
 const { Pool } = require("pg");
 
 const pool = new Pool({
@@ -5,7 +6,12 @@ const pool = new Pool({
     port: Number(process.env.DB_PORT || 5432),
     database: process.env.DB_NAME || "gadgetdb",
     user: process.env.DB_USER || "gadgetuser",
-    password: process.env.DB_PASSWORD
+    password: process.env.DB_PASSWORD,
+    connectionTimeoutMillis: 5000
+});
+
+pool.on("error", (error) => {
+    console.error("Unexpected PostgreSQL pool error:", error.message);
 });
 
 module.exports = pool;
