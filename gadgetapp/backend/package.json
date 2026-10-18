@@ -1,13 +1,15 @@
+
 {
   "name": "gadgetapp-backend",
   "version": "1.0.0",
-  "description": "GadgetApp backend API",
+  "private": true,
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^5.1.0",
+    "multer": "^2.0.2",
     "pg": "^8.16.3"
   }
 }
