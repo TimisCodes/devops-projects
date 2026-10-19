@@ -41,6 +41,76 @@ main {
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+}
+
+.auth-card h2 {
+    margin-top: 0;
+}
+
+.auth-card > p {
+    color: #64748b;
+}
+
+.auth-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.auth-form {
+    display: grid;
+    gap: 10px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.auth-form h3 {
+    margin: 0 0 8px;
+}
+
+.auth-form label,
+.upload-form label {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    min-width: 0;
+    padding: 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: 2px solid #93c5fd;
+    outline-offset: 1px;
+    border-color: #2563eb;
+}
+
+input[type="file"] {
+    width: 100%;
+    max-width: 100%;
+    font-size: 13px;
+}
+
+.auth-status,
+.upload-status {
+    font-size: 13px;
+    color: #475569;
+    overflow-wrap: anywhere;
+}
+
+#account-panel p {
+    overflow-wrap: anywhere;
 }
 
 .section-heading {
@@ -118,6 +188,7 @@ main {
 
 .download-link {
     display: inline-block;
+    margin-bottom: 10px;
     color: #1d4ed8;
     font-weight: bold;
     font-size: 13px;
@@ -136,16 +207,21 @@ main {
     border-top: 1px solid #e5e7eb;
 }
 
-.upload-form label {
-    font-size: 13px;
-    font-weight: bold;
-    line-height: 1.5;
+.image-preview {
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 8px;
+    background: #f8fafc;
 }
 
-input[type="file"] {
-    width: 100%;
-    max-width: 100%;
+.upload-status,
+.empty-message {
     font-size: 13px;
+    color: #64748b;
+    overflow-wrap: anywhere;
 }
 
 button {
@@ -176,21 +252,13 @@ button:disabled {
     background: #cbd5e1;
 }
 
-.image-preview {
-    width: 100%;
-    max-height: 220px;
-    object-fit: contain;
-    border: 1px dashed #cbd5e1;
-    border-radius: 8px;
-    padding: 8px;
-    background: #f8fafc;
+.danger-button {
+    background: #dc2626;
+    color: white;
 }
 
-.upload-status,
-.empty-message {
-    font-size: 13px;
-    color: #64748b;
-    overflow-wrap: anywhere;
+.danger-button:hover {
+    background: #b91c1c;
 }
 
 footer {
@@ -200,7 +268,11 @@ footer {
     font-size: 13px;
 }
 
-@media (max-width: 600px) {
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 650px) {
     main {
         margin: 20px auto;
         padding: 0 12px;
@@ -210,7 +282,12 @@ footer {
         padding: 16px;
     }
 
+    .auth-grid,
     .gadget-grid {
         grid-template-columns: 1fr;
+    }
+
+    .auth-form {
+        padding: 14px;
     }
 }

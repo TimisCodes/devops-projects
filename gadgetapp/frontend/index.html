@@ -4,23 +4,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Manage gadgets and their images.">
+    <meta name="description" content="Manage gadgets and their images securely.">
     <title>GadgetApp | Inventory Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Timi's Latest GadgetApp</h1>
+        <h1>GadgetApp</h1>
         <p>Your gadget inventory dashboard</p>
     </header>
 
     <main>
+        <section class="card auth-card">
+            <div id="auth-forms">
+                <h2>Your Account</h2>
+                <p>Create an account or sign in before uploading images.</p>
+
+                <div class="auth-grid">
+                    <form id="register-form" class="auth-form">
+                        <h3>Create Account</h3>
+
+                        <label for="register-username">Username</label>
+                        <input
+                            id="register-username"
+                            name="username"
+                            type="text"
+                            autocomplete="username"
+                            minlength="3"
+                            maxlength="30"
+                            required
+                        >
+
+                        <label for="register-email">Email</label>
+                        <input
+                            id="register-email"
+                            name="email"
+                            type="email"
+                            autocomplete="email"
+                            required
+                        >
+
+                        <label for="register-password">Password</label>
+                        <input
+                            id="register-password"
+                            name="password"
+                            type="password"
+                            autocomplete="new-password"
+                            minlength="12"
+                            required
+                        >
+
+                        <button type="submit">Create Account</button>
+                        <p id="register-status" class="auth-status" role="status"></p>
+                    </form>
+
+                    <form id="login-form" class="auth-form">
+                        <h3>Sign In</h3>
+
+                        <label for="login-email">Email</label>
+                        <input
+                            id="login-email"
+                            name="email"
+                            type="email"
+                            autocomplete="email"
+                            required
+                        >
+
+                        <label for="login-password">Password</label>
+                        <input
+                            id="login-password"
+                            name="password"
+                            type="password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button type="submit">Sign In</button>
+                        <p id="login-status" class="auth-status" role="status"></p>
+                    </form>
+                </div>
+            </div>
+
+            <div id="account-panel" hidden>
+                <h2>Account</h2>
+                <p>Signed in as <strong id="account-username"></strong></p>
+                <p id="account-email"></p>
+                <button id="logout-button" class="danger-button" type="button">
+                    Sign Out
+                </button>
+                <p id="account-status" role="status"></p>
+            </div>
+        </section>
+
         <section class="card">
             <div class="section-heading">
                 <div>
                     <h2>Available Gadgets</h2>
                     <p>Browse gadgets, upload photos and download images.</p>
                 </div>
+
                 <button id="refresh-button" class="secondary-button" type="button">
                     Refresh
                 </button>

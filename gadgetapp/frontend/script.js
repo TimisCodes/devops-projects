@@ -3,6 +3,15 @@ const statusElement = document.getElementById("status");
 const gadgetList = document.getElementById("gadget-list");
 const refreshButton = document.getElementById("refresh-button");
 
+const authForms = document.getElementById("auth-forms");
+const accountPanel = document.getElementById("account-panel");
+const accountUsername = document.getElementById("account-username");
+const accountEmail = document.getElementById("account-email");
+
+const registerForm = document.getElementById("register-form");
+const loginForm = document.getElementById("login-form");
+const logoutButton = document.getElementById("logout-button");
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = [
     "image/jpeg",
@@ -11,22 +20,163 @@ const ALLOWED_TYPES = [
     "image/gif"
 ];
 
+let currentUser = null;
+let loadingGadgets = false;
+
+async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        credentials: "same-origin",
+        ...options
+    });
+
+    const contentType = response.headers.get("content-type") || "";
+    let result = {};
+
+    if (contentType.includes("application/json")) {
+        result = await response.json();
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            result.error || result.message || `Request failed (${response.status}).`
+        );
+    }
+
+    return result;
+}
+
+function setAuthStatus(id, message) {
+    document.getElementById(id).textContent = message;
+}
+
+function showAccount(user) {
+    currentUser = user;
+
+    authForms.hidden = Boolean(user);
+    accountPanel.hidden = !user;
+
+    if (user) {
+        accountUsername.textContent = user.username || user.email;
+        accountEmail.textContent = user.email || "";
+    }
+}
+
+async function checkSession() {
+    try {
+        const result = await apiRequest("/api/auth/me");
+        showAccount(result.user || result);
+    } catch (error) {
+        if (error.message.includes("401") ||
+            error.message.toLowerCase().includes("unauthorized")) {
+            showAccount(null);
+            return;
+        }
+
+        // If the session endpoint is unavailable, don't assume a user is logged in.
+        showAccount(null);
+        console.error("Could not verify the session:", error);
+    }
+}
+
+registerForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = registerForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    setAuthStatus("register-status", "Creating your account...");
+
+    const formData = new FormData(registerForm);
+
+    try {
+        const result = await apiRequest("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: formData.get("username").trim(),
+                email: formData.get("email").trim(),
+                password: formData.get("password")
+            })
+        });
+
+        // The API may automatically sign the new user in.
+        if (result.user) {
+            showAccount(result.user);
+            registerForm.reset();
+            setAuthStatus("register-status", "Account created successfully.");
+            await loadGadgets();
+        } else {
+            setAuthStatus(
+                "register-status",
+                "Account created. Please sign in."
+            );
+        }
+    } catch (error) {
+        setAuthStatus("register-status", error.message);
+    } finally {
+        button.disabled = false;
+    }
+});
+
+loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = loginForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    setAuthStatus("login-status", "Signing in...");
+
+    const formData = new FormData(loginForm);
+
+    try {
+        const result = await apiRequest("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: formData.get("email").trim(),
+                password: formData.get("password")
+            })
+        });
+
+        const user = result.user || result;
+        showAccount(user);
+        loginForm.reset();
+        setAuthStatus("login-status", "Signed in successfully.");
+        await loadGadgets();
+    } catch (error) {
+        setAuthStatus("login-status", error.message);
+    } finally {
+        button.disabled = false;
+    }
+});
+
+logoutButton.addEventListener("click", async () => {
+    logoutButton.disabled = true;
+    document.getElementById("account-status").textContent = "Signing out...";
+
+    try {
+        await apiRequest("/api/auth/logout", { method: "POST" });
+        showAccount(null);
+        document.getElementById("account-status").textContent =
+            "You have signed out.";
+        await loadGadgets();
+    } catch (error) {
+        document.getElementById("account-status").textContent = error.message;
+    } finally {
+        logoutButton.disabled = false;
+    }
+});
+
 async function loadGadgets() {
+    if (loadingGadgets) return;
+
+    loadingGadgets = true;
     statusElement.textContent = "Loading gadgets...";
     refreshButton.disabled = true;
 
     try {
-        const response = await fetch("/api/gadgets");
-
-        if (!response.ok) {
-            throw new Error("Could not retrieve gadgets.");
-        }
-
-        const gadgets = await response.json();
+        const gadgets = await apiRequest("/api/gadgets");
 
         gadgetList.replaceChildren();
-        statusElement.textContent =
-            `${gadgets.length} gadget(s) found`;
+        statusElement.textContent = `${gadgets.length} gadget(s) found`;
 
         if (gadgets.length === 0) {
             statusElement.textContent = "No gadgets found.";
@@ -38,10 +188,10 @@ async function loadGadgets() {
     } catch (error) {
         statusElement.textContent =
             "Unable to load gadgets. Check the backend and database.";
-
         console.error(error);
     } finally {
         refreshButton.disabled = false;
+        loadingGadgets = false;
     }
 }
 
@@ -67,26 +217,7 @@ function createGadgetCard(gadget) {
 
     if (gadget.images?.length) {
         gadget.images.forEach((image) => {
-            const imageCard = document.createElement("div");
-            imageCard.className = "image-item";
-
-            const img = document.createElement("img");
-            img.src = image.url;
-            img.alt = `${gadget.name} — ${image.original_name}`;
-            img.loading = "lazy";
-
-            const fileName = document.createElement("p");
-            fileName.className = "file-name";
-            fileName.textContent = image.original_name;
-
-            const downloadLink = document.createElement("a");
-            downloadLink.href = `${image.url}/download`;
-            downloadLink.textContent = "Download image";
-            downloadLink.className = "download-link";
-            downloadLink.setAttribute("download", "");
-
-            imageCard.append(img, fileName, downloadLink);
-            imageGallery.appendChild(imageCard);
+            imageGallery.appendChild(createImageCard(gadget, image));
         });
     } else {
         const emptyMessage = document.createElement("p");
@@ -99,18 +230,29 @@ function createGadgetCard(gadget) {
     uploadForm.className = "upload-form";
 
     const uploadLabel = document.createElement("label");
-    uploadLabel.textContent = "Choose an image (JPEG, PNG, WEBP or GIF; max 5 MB)";
+    uploadLabel.textContent =
+        "Choose an image (JPEG, PNG, WEBP or GIF; max 5 MB)";
 
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.name = "image";
-    fileInput.accept = "image/jpeg,image/png,image/webp,image/gif";
+    fileInput.accept = ALLOWED_TYPES.join(",");
     fileInput.required = true;
+    fileInput.disabled = !currentUser;
 
     const preview = document.createElement("img");
     preview.className = "image-preview";
     preview.alt = "Selected image preview";
     preview.hidden = true;
+
+    const uploadButton = document.createElement("button");
+    uploadButton.type = "submit";
+    uploadButton.textContent = currentUser ? "Upload image" : "Sign in to upload";
+    uploadButton.disabled = !currentUser;
+
+    const uploadStatus = document.createElement("p");
+    uploadStatus.className = "upload-status";
+    uploadStatus.setAttribute("role", "status");
 
     let previewUrl = null;
 
@@ -124,17 +266,17 @@ function createGadgetCard(gadget) {
         preview.removeAttribute("src");
 
         const file = fileInput.files[0];
-
         if (!file) return;
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            alert("Please choose a JPEG, PNG, WEBP or GIF image.");
+            uploadStatus.textContent =
+                "Choose a JPEG, PNG, WEBP or GIF image.";
             fileInput.value = "";
             return;
         }
 
         if (file.size > MAX_FILE_SIZE) {
-            alert("The image must be 5 MB or smaller.");
+            uploadStatus.textContent = "The image must be 5 MB or smaller.";
             fileInput.value = "";
             return;
         }
@@ -142,15 +284,8 @@ function createGadgetCard(gadget) {
         previewUrl = URL.createObjectURL(file);
         preview.src = previewUrl;
         preview.hidden = false;
+        uploadStatus.textContent = "";
     });
-
-    const uploadButton = document.createElement("button");
-    uploadButton.type = "submit";
-    uploadButton.textContent = "Upload image";
-
-    const uploadStatus = document.createElement("p");
-    uploadStatus.className = "upload-status";
-    uploadStatus.setAttribute("role", "status");
 
     uploadForm.append(
         uploadLabel,
@@ -162,6 +297,12 @@ function createGadgetCard(gadget) {
 
     uploadForm.addEventListener("submit", async (event) => {
         event.preventDefault();
+
+        if (!currentUser) {
+            uploadStatus.textContent =
+                "Create an account or sign in before uploading.";
+            return;
+        }
 
         const file = fileInput.files[0];
 
@@ -184,19 +325,10 @@ function createGadgetCard(gadget) {
         uploadStatus.textContent = "Uploading image...";
 
         try {
-            const response = await fetch(
-                `/api/gadgets/${gadget.id}/images`,
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || "Upload failed.");
-            }
+            await apiRequest(`/api/gadgets/${gadget.id}/images`, {
+                method: "POST",
+                body: formData
+            });
 
             uploadStatus.textContent = "Image uploaded successfully!";
             fileInput.value = "";
@@ -210,8 +342,8 @@ function createGadgetCard(gadget) {
         } catch (error) {
             uploadStatus.textContent = error.message;
         } finally {
-            uploadButton.disabled = false;
-            fileInput.disabled = false;
+            uploadButton.disabled = !currentUser;
+            fileInput.disabled = !currentUser;
         }
     });
 
@@ -227,6 +359,73 @@ function createGadgetCard(gadget) {
     return card;
 }
 
+function createImageCard(gadget, image) {
+    const imageCard = document.createElement("div");
+    imageCard.className = "image-item";
+
+    const img = document.createElement("img");
+    img.src = image.url;
+    img.alt = `${gadget.name} — ${image.original_name}`;
+    img.loading = "lazy";
+
+    const fileName = document.createElement("p");
+    fileName.className = "file-name";
+    fileName.textContent = image.original_name;
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = `${image.url}/download`;
+    downloadLink.textContent = "Download image";
+    downloadLink.className = "download-link";
+    downloadLink.setAttribute("download", "");
+
+    imageCard.append(img, fileName, downloadLink);
+
+    if (currentUser) {
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "danger-button";
+        deleteButton.textContent = "Delete image";
+
+        const deleteStatus = document.createElement("p");
+        deleteStatus.className = "upload-status";
+        deleteStatus.setAttribute("role", "status");
+
+        deleteButton.addEventListener("click", async () => {
+            const confirmed = window.confirm(
+                `Delete "${image.original_name}"? This action cannot be undone.`
+            );
+
+            if (!confirmed) return;
+
+            deleteButton.disabled = true;
+            deleteStatus.textContent = "Deleting image...";
+
+            try {
+                // Requires a backend DELETE route and server-side permission checks.
+                await apiRequest(
+                    `/api/gadgets/${gadget.id}/images/${image.id}`,
+                    { method: "DELETE" }
+                );
+
+                deleteStatus.textContent = "Image deleted.";
+                await loadGadgets();
+            } catch (error) {
+                deleteStatus.textContent = error.message;
+                deleteButton.disabled = false;
+            }
+        });
+
+        imageCard.append(deleteButton, deleteStatus);
+    }
+
+    return imageCard;
+}
+
 refreshButton.addEventListener("click", loadGadgets);
 
-loadGadgets();
+async function initializeApp() {
+    await checkSession();
+    await loadGadgets();
+}
+
+initializeApp();
