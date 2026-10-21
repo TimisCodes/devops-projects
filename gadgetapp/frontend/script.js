@@ -2,6 +2,8 @@
 const statusElement = document.getElementById("status");
 const gadgetList = document.getElementById("gadget-list");
 const refreshButton = document.getElementById("refresh-button");
+const searchInput = document.getElementById("gadget-search");
+const categoryFilters = document.getElementById("category-filters");
 
 const authForms = document.getElementById("auth-forms");
 const accountPanel = document.getElementById("account-panel");
@@ -22,6 +24,8 @@ const ALLOWED_TYPES = [
 
 let currentUser = null;
 let loadingGadgets = false;
+let availableGadgets = [];
+let selectedCategory = "all";
 
 async function apiRequest(url, options = {}) {
     const response = await fetch(url, {
@@ -173,18 +177,9 @@ async function loadGadgets() {
     refreshButton.disabled = true;
 
     try {
-        const gadgets = await apiRequest("/api/gadgets");
-
-        gadgetList.replaceChildren();
-        statusElement.textContent = `${gadgets.length} gadget(s) found`;
-
-        if (gadgets.length === 0) {
-            statusElement.textContent = "No gadgets found.";
-        }
-
-        gadgets.forEach((gadget) => {
-            gadgetList.appendChild(createGadgetCard(gadget));
-        });
+        availableGadgets = await apiRequest("/api/gadgets");
+        renderCategoryFilters();
+        renderGadgets();
     } catch (error) {
         statusElement.textContent =
             "Unable to load gadgets. Check the backend and database.";
@@ -194,6 +189,78 @@ async function loadGadgets() {
         loadingGadgets = false;
     }
 }
+
+function renderCategoryFilters() {
+    const categories = [...new Set(
+        availableGadgets
+            .map((gadget) => gadget.category)
+            .filter(Boolean)
+    )].sort((first, second) => first.localeCompare(second));
+
+    categoryFilters.replaceChildren();
+    ["all", ...categories].forEach((category) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "filter-chip";
+        button.dataset.filter = category;
+        button.textContent = category === "all" ? "Everything" : category;
+        button.setAttribute("aria-pressed", String(category === selectedCategory));
+        button.classList.toggle("active", category === selectedCategory);
+        categoryFilters.appendChild(button);
+    });
+}
+
+function renderGadgets() {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const filteredGadgets = availableGadgets.filter((gadget) => {
+        const matchesCategory = selectedCategory === "all" ||
+            gadget.category?.toLowerCase() === selectedCategory.toLowerCase();
+        const searchableText = `${gadget.name} ${gadget.category}`.toLowerCase();
+        return matchesCategory && searchableText.includes(searchTerm);
+    });
+
+    gadgetList.replaceChildren();
+    filteredGadgets.forEach((gadget) => {
+        gadgetList.appendChild(createGadgetCard(gadget));
+    });
+
+    if (availableGadgets.length === 0) {
+        statusElement.textContent = "No gadgets in the collection yet.";
+    } else if (filteredGadgets.length === 0) {
+        statusElement.textContent = "No gadgets match this search.";
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "empty-message";
+        emptyMessage.textContent = "Try another name or category.";
+        gadgetList.appendChild(emptyMessage);
+    } else {
+        statusElement.textContent = `${filteredGadgets.length} ${filteredGadgets.length === 1 ? "piece" : "pieces"} in the collection`;
+    }
+}
+
+categoryFilters.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-filter]");
+    if (!button) return;
+
+    selectedCategory = button.dataset.filter;
+    renderCategoryFilters();
+    renderGadgets();
+});
+
+searchInput.addEventListener("input", renderGadgets);
+
+document.querySelectorAll(".category-links a[data-category]").forEach((link) => {
+    link.addEventListener("click", () => {
+        const category = availableGadgets.find((gadget) =>
+            gadget.category?.toLowerCase() === link.dataset.category.toLowerCase()
+        )?.category;
+
+        if (category) {
+            selectedCategory = category;
+            renderCategoryFilters();
+            renderGadgets();
+        }
+    });
+});
 
 function createGadgetCard(gadget) {
     const card = document.createElement("article");
