@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS gadgets (
     category VARCHAR(100) NOT NULL,
     price NUMERIC(10, 2) NOT NULL
 );
-<!-- Create a table to store gadget images with a foreign key reference to the gadgets table. -->
+<!-- Update Create a table to store gadget images with a foreign key reference to the gadgets table. -->
 
 CREATE TABLE IF NOT EXISTS gadget_images (
     id SERIAL PRIMARY KEY,
