@@ -1,4 +1,9 @@
 apiVersion: v1
-kind: Pod 
+kind: ConfigMap 
 metadata:
-  name: app-propetties
+  name: app-properties
+data:
+  APP_NAME: "GadgetApp" 
+  APP_ENV: "development"
+  LOG_LEVEL: "info" 
+  
