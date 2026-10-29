@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gadget-pod
+specs:
+  container: 
+    - name: 
+      image: busybox:1.36
+      commands: ['/bin/sh', '-c']
+      args: 
+        - 'echo "Welcome to GadgetApp"; sleep 5;'
+        
