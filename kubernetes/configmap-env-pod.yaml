@@ -9,4 +9,10 @@ specs:
       commands: ['/bin/sh', '-c']
       args: 
         - 'echo "Welcome to GadgetApp"; sleep 5;'
-        
+      env:
+        name: APP_ENV
+        valueFrom:
+          configMapKeyRef:
+            name: 
+            key: APP_ENV
+          
