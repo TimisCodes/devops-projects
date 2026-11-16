@@ -1,0 +1,25 @@
+mysql:
+  image: mysql:8.0
+  port: 3306
+  storage: 1Gi
+  storageClassName: default
+
+wordpress:
+  image: wordpress:latest
+  port: 80
+  storage: 3Gi
+  storageClassName: default
+  serviceType: ClusterIP
+
+secret:
+  mysqlRootPassword: cm9vdHBhc3N3b3Jk
+  mysqlPassword: d29yZHByZXNzcGFzcw==
+  mysqlDatabase: d29yZHByZXNz
+  mysqlUser: d29yZHByZXNz
+
+ingress:
+  enabled: true
+  className: nginx
+  host: wordpress.hkhinfoteck.xyz
+
+# New version 1.2  
