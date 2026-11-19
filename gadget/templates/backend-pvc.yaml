@@ -1,0 +1,16 @@
+{{- if .Values.backend.uploads.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "gadget.backend.fullname" . }}-uploads-pvc
+  labels:
+    {{- include "gadget.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.backend.uploads.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.backend.uploads.storage }}
+{{- end }}

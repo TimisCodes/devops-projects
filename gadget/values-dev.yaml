@@ -1,0 +1,19 @@
+# Development overrides (Minikube)
+# Usage: helm install gadgetapp ./gadget -f gadget/values-dev.yaml \
+#          --set secrets.dbPassword=... --set secrets.sessionSecret=... --set secrets.postgresPassword=...
+
+frontend:
+  service:
+    type: NodePort
+    nodePort: 30080
+
+backend:
+  uploads:
+    storageClassName: standard   # Minikube default StorageClass
+
+database:
+  storageClassName: standard
+
+config:
+  s3BucketName: "timiscode-gadgetapp-images-2026"
+  awsRegion: "us-east-1"

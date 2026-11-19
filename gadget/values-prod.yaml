@@ -1,0 +1,33 @@
+# Production overrides (Amazon EKS)
+# Usage: helm upgrade --install gadgetapp ./gadget -f gadget/values-prod.yaml \
+#          --set secrets.dbPassword=... --set secrets.sessionSecret=... --set secrets.postgresPassword=...
+
+frontend:
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  service:
+    type: ClusterIP   # traffic comes through Ingress
+
+backend:
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  uploads:
+    storageClassName: gp2   # EKS default EBS StorageClass
+
+database:
+  storageClassName: gp2
+  storage: 20Gi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+  host: "gadgetapp.example.com"
+
+# On EKS with IRSA, annotate the ServiceAccount with the IAM role ARN:
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::ACCOUNT_ID:role/gadgetapp-s3-role"

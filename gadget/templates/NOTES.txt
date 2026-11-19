@@ -1,0 +1,32 @@
+GadgetApp has been deployed!
+
+Release: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+Components deployed:
+  - Frontend  (Nginx + React)  → {{ include "gadget.frontend.fullname" . }}
+  - Backend   (Node.js :2300)  → {{ include "gadget.backend.fullname" . }}
+  - Database  (PostgreSQL 17)  → {{ include "gadget.database.fullname" . }}
+
+---
+Access the frontend (Minikube):
+
+  minikube service {{ include "gadget.frontend.fullname" . }} --url
+
+Or via port-forward:
+
+  kubectl port-forward svc/{{ include "gadget.frontend.fullname" . }} 8080:80
+  open http://localhost:8080
+
+Test the backend health endpoint:
+
+  kubectl port-forward svc/{{ include "gadget.backend.fullname" . }} 2300:2300
+  curl http://localhost:2300/api/health
+
+Check all resources:
+
+  kubectl get deployments,pods,services,pvc,secrets,configmaps -l app.kubernetes.io/instance={{ .Release.Name }}
+
+{{- if .Values.ingress.enabled }}
+Ingress host: http://{{ .Values.ingress.host }}
+{{- end }}
